@@ -1,10 +1,22 @@
 // --------------------- Je récupère les données du serveur ---------------------
 
-// Je récupère la liste des projets avec l'API
-const apiLink = "http://localhost:5678/api/";
-const response = await fetch(apiLink + "works");
-const projectList = await response.json();
 const filterContainer = document.querySelector(".project-filters");
+
+// Je récupère la liste des projets avec l'API
+//Récupération des pièces eventuellement stockées dans le localStorage
+let projectList = window.localStorage.getItem("projectListStored");
+
+if (projectList === null) {
+  // Récupération des pièces depuis l'API
+  const response = await fetch("http://localhost:5678/api/works");
+  projectList = await response.json();
+  // Transformation des pièces en JSON
+  const stringProjectList = JSON.stringify(projectList);
+  // Stockage des informations dans le localStorage
+  window.localStorage.setItem("projectListStored", stringProjectList);
+} else {
+  projectList = JSON.parse(projectList);
+}
 
 // Genère dynamiquement les projets
 function genererProjets(projectsToGenerate) {
