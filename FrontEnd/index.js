@@ -1,21 +1,29 @@
 // --------------------- Je récupère les données du serveur ---------------------
 
-const filterContainer = document.querySelector(".project-filters");
-
-// Je récupère la liste des projets avec l'API
-//Récupération des pièces eventuellement stockées dans le localStorage
+//Récupere la liste des projets et catégories dans le localStorage
 let projectList = window.localStorage.getItem("projectListStored");
+let projectCategories = window.localStorage.getItem("projectCategoriesStored");
 
-if (projectList === null) {
-  // Récupération des pièces depuis l'API
+//Si pas dans le localStorage les demande a l'API et les stocke
+if (projectList === null || projectCategories === null) {
+  // Liste des projets
   const response = await fetch("http://localhost:5678/api/works");
   projectList = await response.json();
-  // Transformation des pièces en JSON
+  //liste des catégories
+  const responseCategories = await fetch(
+    "http://localhost:5678/api/categories"
+  );
+  projectCategories = await responseCategories.json();
+
+  // Transformation des listes en JSON
   const stringProjectList = JSON.stringify(projectList);
+  const stringCategoriesList = JSON.stringify(projectCategories);
   // Stockage des informations dans le localStorage
   window.localStorage.setItem("projectListStored", stringProjectList);
+  window.localStorage.setItem("projectCategoriesStored", stringCategoriesList);
 } else {
   projectList = JSON.parse(projectList);
+  projectCategories = JSON.parse(projectCategories);
 }
 
 // Genère dynamiquement les projets
@@ -34,40 +42,50 @@ function genererProjets(projectsToGenerate) {
   }
 }
 
+//genere le filtres depuis la liste des categories
+function genererFiltres(filtersToGenerate) {
+  const filterContainer = document.querySelector(".project-filters");
+
+  filterContainer.innerHTML += `<button class="filter-button">Tous</button>`;
+
+  for (let i in filtersToGenerate) {
+    let filterId = filtersToGenerate[i].id;
+    let filterName = filtersToGenerate[i].name;
+
+    filterContainer.innerHTML += `<button id=category-${filterId}-button class="filter-button">${filterName}</button>`;
+  }
+}
+
 // Genère tout les projets
 genererProjets(projectList);
 
-// --------------------- Je gère les filtres ---------------------
-filterContainer.innerHTML = `<button class="filter-button">Tous</button>
-<button id=category-1-button class="filter-button">Objets</button>
-<button id=category-2-button class="filter-button">Appartements</button>
-<button id=category-3-button class="filter-button">Hôtels & restaurants</button>`;
+// --------------------- Les filtres ---------------------
 
-const buttonCategory1 = document.getElementById("category-1-button");
-const buttonCategory2 = document.getElementById("category-2-button");
-const buttonCategory3 = document.getElementById("category-3-button");
+genererFiltres(projectCategories);
+
 const filterButtons = document.querySelectorAll(".filter-button");
 
 //Réponds au click sur un boutton des filtres
-for (let i in filterButtons) {
-  filterButtons[i].addEventListener("click", () => {
+for (let button in filterButtons) {
+  filterButtons[button].addEventListener("click", () => {
     //crée une variable category depuis l'id du bouton (0 represente le bouton Tous)
     let category = 0;
-    if (filterButtons[i] == buttonCategory1) {
-      category = 1;
-    } else if (filterButtons[i] == buttonCategory2) {
-      category = 2;
-    } else if (filterButtons[i] == buttonCategory3) {
-      category = 3;
+    //Compare le bouton cliqué avec la classe du bouton qui indique la catégorie
+    for (let i in projectCategories + 1) {
+      if (
+        filterButtons[button] == document.getElementById(`category-${i}-button`)
+      ) {
+        category = i;
+      }
     }
     //copie la liste des projets pour ne pas modifier la liste initiale
     let filteredProjects = Array.from(projectList);
 
     //Trie la liste selon la catégorie, le bouton Tous (cathégorie 0) ne fait rien
     if (category != 0) {
-      for (let x = filteredProjects.length - 1; x >= 0; x--) {
-        if (filteredProjects[x].categoryId != category) {
-          filteredProjects.splice(x, 1);
+      for (let j = filteredProjects.length - 1; j >= 0; j--) {
+        if (filteredProjects[j].categoryId != category) {
+          filteredProjects.splice(j, 1);
         }
       }
     }
