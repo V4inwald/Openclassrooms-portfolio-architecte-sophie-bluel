@@ -63,18 +63,16 @@ genererProjets(projectList);
 
 genererFiltres(projectCategories);
 
-const filterButtons = document.querySelectorAll(".filter-button");
+const filterButtons = document.getElementsByClassName("filter-button");
 
 //Réponds au click sur un boutton des filtres
-for (let button in filterButtons) {
-  filterButtons[button].addEventListener("click", () => {
+for (let button of filterButtons) {
+  button.addEventListener("click", () => {
     //crée une variable category depuis l'id du bouton (0 represente le bouton Tous)
     let category = 0;
     //Compare le bouton cliqué avec la classe du bouton qui indique la catégorie
     for (let i in projectCategories + 1) {
-      if (
-        filterButtons[button] == document.getElementById(`category-${i}-button`)
-      ) {
+      if (button == document.getElementById(`category-${i}-button`)) {
         category = i;
       }
     }
@@ -94,3 +92,22 @@ for (let button in filterButtons) {
     genererProjets(filteredProjects);
   });
 }
+
+// --------------------- Fenetre modale et espace administrateur ---------------------
+// Je verifie si il y a un tocken, si oui j'affiche la fenetre modale
+
+/*
+
+console.log("avant le if");
+
+if (sessionStorage.getItem("token") !== null) {
+  const userTokenToParse = sessionStorage.getItem("token");
+  const userToken = JSON.parse(userTokenToParse);
+  console.log(userToken);
+
+  //cacher les filtres
+  const hideFilters = document.querySelector(".project-filters");
+  hideFilters.style.display = "none";
+}
+
+*/
