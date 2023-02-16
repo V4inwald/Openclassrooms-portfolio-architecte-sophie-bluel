@@ -96,18 +96,22 @@ for (let button of filterButtons) {
 // --------------------- Fenetre modale et espace administrateur ---------------------
 // Je verifie si il y a un tocken, si oui j'affiche la fenetre modale
 
-/*
-
-console.log("avant le if");
-
 if (sessionStorage.getItem("token") !== null) {
-  const userTokenToParse = sessionStorage.getItem("token");
-  const userToken = JSON.parse(userTokenToParse);
-  console.log(userToken);
+  const userToken = sessionStorage.getItem("token");
 
   //cacher les filtres
   const hideFilters = document.querySelector(".project-filters");
   hideFilters.style.display = "none";
-}
 
-*/
+  //changer login en logout
+  const linksNavigation = document.querySelectorAll("header nav li a");
+  const authentication = linksNavigation[2];
+  authentication.innerHTML = "logout";
+
+  //lors du logout je supprime le token
+  authentication.addEventListener("click", (event) => {
+    event.preventDefault();
+    window.sessionStorage.removeItem("token");
+    location.reload();
+  });
+}
