@@ -104,6 +104,44 @@ a {
 li:hover {
 	color: #B1663C;
 }
+
+.js-admin-toolbar-hidden {
+	width: 100%;
+	position: fixed;
+    left: 0;
+    top: 0;
+	
+}
+
+.js-admin-toolbar-visible {
+	background-color: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap : 20px;
+	height: 60px;
+
+}
+
+.admin-toolbar-text {
+	color: white;
+	display: flex;
+	gap : 10px;
+	font-size: 16px;
+}
+
+.admin-toolbar-button {
+	background-color: #FFFFFF;
+	color: black;
+	border-radius: 60px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px 20px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
 #introduction {
 	display: flex;
 	align-items: center;
@@ -129,10 +167,28 @@ li:hover {
 }
 #portfolio h2 {
 	text-align: center;
-	margin-bottom: 1em;
 }
 
-.project-filters {
+.portfolio-title-layout {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1rem;
+
+}
+
+.js-modal-edit {
+	display: flex;
+	gap: 10px;
+	border: none;
+	font-size: 1rem;
+	padding: 10px;
+	background-color: inherit;
+	cursor: pointer;
+}
+
+.js-project-filters {
 	display: flex;
 	justify-content: center;
 	gap: 10px;
@@ -160,7 +216,7 @@ li:hover {
 	color: #FFFFFF;
 }
 
-.gallery {
+.js-gallery {
 	width: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
@@ -168,7 +224,7 @@ li:hover {
 	grid-row-gap: 20px;
 }
 
-.gallery img {
+.js-gallery img {
 	width: 100%;
 
 }

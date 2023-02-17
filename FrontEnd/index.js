@@ -34,7 +34,7 @@ function genererProjets(projectsToGenerate) {
     let src = projectsToGenerate[i].imageUrl;
 
     document.querySelector(
-      ".gallery"
+      ".js-gallery"
     ).innerHTML += `<figure class=category-${category}>
           <img src=${src} alt="${titleProject}}">
           <figcaption>${titleProject}</figcaption>
@@ -44,7 +44,7 @@ function genererProjets(projectsToGenerate) {
 
 //genere le filtres depuis la liste des categories
 function genererFiltres(filtersToGenerate) {
-  const filterContainer = document.querySelector(".project-filters");
+  const filterContainer = document.querySelector(".js-project-filters");
 
   filterContainer.innerHTML += `<button class="filter-button">Tous</button>`;
 
@@ -88,7 +88,7 @@ for (let button of filterButtons) {
       }
     }
     // actualise l'affichage
-    document.querySelector(".gallery").innerHTML = "";
+    document.querySelector(".js-gallery").innerHTML = "";
     genererProjets(filteredProjects);
   });
 }
@@ -100,7 +100,7 @@ if (sessionStorage.getItem("token") !== null) {
   const userToken = sessionStorage.getItem("token");
 
   //cacher les filtres
-  const hideFilters = document.querySelector(".project-filters");
+  const hideFilters = document.querySelector(".js-project-filters");
   hideFilters.style.display = "none";
 
   //changer login en logout
@@ -114,4 +114,22 @@ if (sessionStorage.getItem("token") !== null) {
     window.sessionStorage.removeItem("token");
     location.reload();
   });
+
+  //Ajoute la bande noire en haut de la page
+  const modalElementEdition = document.querySelector(
+    ".js-admin-toolbar-hidden"
+  );
+  modalElementEdition.innerHTML += `<div class="admin-toolbar-text"><i class="fa-regular fa-pen-to-square"></i>
+  <p>Mode édition</p></div> 
+  <button class="admin-toolbar-button">publier les changements</button>`;
+  modalElementEdition.classList.add("js-admin-toolbar-visible");
+  //change un peu le style
+  document.querySelector("header").setAttribute("style", "margin-top:100px");
+  document
+    .querySelector(".portfolio-title-layout")
+    .setAttribute("style", "margin-bottom:3em");
+
+  const openEdit = document.querySelector(".js-modal-edit");
+  openEdit.innerHTML += `<i class="fa-regular fa-pen-to-square"></i>
+  <p>modifier</p>`;
 }

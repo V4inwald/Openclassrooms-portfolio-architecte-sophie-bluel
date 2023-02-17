@@ -10,8 +10,23 @@
 	<meta name="description" content="">
 	<link rel="stylesheet" href="./assets/style.css">
 	<script src="./index.js" type="module" defer></script>
+	<script src="https://kit.fontawesome.com/7222a0754e.js" crossorigin="anonymous"></script>
 </head>
 <body>
+<div class="js-admin-toolbar-hidden"></div>
+<div class="modal-container">
+	<!-- a voir si je le crée depuis le js ou non -->
+	<div class="overlay modal-trigger"></div>
+	<div class="modal">
+		<button class="close-modal modal-trigger">
+			<i class="fa-solid fa-x"></i>
+		</button>
+		<h1>Galerie photo</h1>
+		<div class="editContainer"></div>
+		<button class="addWork"></button>
+		<a href="#" class="deleteAllWorks"></a>
+	</div>
+</div>
 <header>
 	<h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
 	<nav>
@@ -36,9 +51,12 @@
 		</article>
 	</section>
 	<section id="portfolio">
-		<h2>Mes Projets</h2>
-		<div class="project-filters"></div>
-		<div class="gallery"></div>
+		<div class="portfolio-title-layout">
+			<h2>Mes Projets</h2>
+			<button class="js-modal-edit modal-trigger"></button>
+		</div>
+		<div class="js-project-filters"></div>
+		<div class="js-gallery"></div>
 	</section>
 	<section id="contact">
 		<h2>Contact</h2>
