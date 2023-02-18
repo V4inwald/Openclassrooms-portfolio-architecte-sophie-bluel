@@ -270,7 +270,8 @@ margin: auto;
 	margin-bottom: 7em;
 }
 
-input[type="submit"]{
+input[type="submit"],
+.modal-buttons {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
@@ -297,3 +298,132 @@ footer nav ul {
 	margin: 2em
 }
 
+.modal-container {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.modal-container.active {
+	display: block;
+}
+
+.overlay {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: #0000004D;
+}
+
+.modal {
+	max-width: 630px;
+	width: 400px;
+	max-height: 700px;
+	background-color: white;
+	position: absolute;
+	top: 40%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 30px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+}
+
+.modal-header-one,
+.modal-header-two {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.modal-header-one {
+	justify-content: flex-end;
+}
+
+.back-arrow-icon {
+	font-size: 18px;
+}
+
+#delete-gallery {
+	font-family: 'Syne';
+	color:#D65353;
+	font-weight: 400;
+}
+
+.modal-footer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.modal-title {
+	font-family: 'Work Sans';
+	/* font-size: 26px; */
+	font-weight: 400;
+	color: black;
+	margin-bottom: 2.85rem;
+}
+
+.modal-buttons {
+	border-style: none;
+	width: fit-content;
+	padding: 0.65rem 3rem;
+}
+
+#confirm-add-work {
+	margin-bottom: 0px;
+}
+
+.grey-bar {
+	width: 100%;
+	height: 1px;
+	background-color:#B3B3B3;
+	margin-top: 1rem;
+}
+
+.add-works-step-modal,
+.gallery-step-modal {
+	width: 100%;
+	height: 100%;
+}
+
+
+/* On first toggle hides .gallery-step-modal and shows .add-works-step-modal*/
+/* Does the opposite after */
+
+.add-works-step-modal,
+.gallery-step-modal.active {
+	display: none;
+}
+
+.add-works-step-modal.active, 
+.gallery-step-modal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+}
+/*  */
+.edit-gallery-container {
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-column-gap: 10px;
+	grid-row-gap: 15px;
+
+}
+
+.edit-gallery-work img {
+	width: 100%;
+	/* height: 100px; */
+	object-fit: cover;
+
+}

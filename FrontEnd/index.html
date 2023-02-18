@@ -14,17 +14,45 @@
 </head>
 <body>
 <div class="js-admin-toolbar-hidden"></div>
+
+<!-- fenetre modale -->
+
 <div class="modal-container">
-	<!-- a voir si je le crée depuis le js ou non -->
 	<div class="overlay modal-trigger"></div>
 	<div class="modal">
-		<button class="close-modal modal-trigger">
-			<i class="fa-solid fa-x"></i>
-		</button>
-		<h1>Galerie photo</h1>
-		<div class="editContainer"></div>
-		<button class="addWork"></button>
-		<a href="#" class="deleteAllWorks"></a>
+		<!-- étape 1 de la fenetre modale  -->
+		<div class="gallery-step-modal">
+			<div class="modal-header-one">
+				<a href="#" class="close-modal modal-trigger">
+					<i class="fa-solid fa-x"></i>
+				</a>
+			</div>
+			<h1 class="modal-title">Galerie photo</h1>
+			<div class="edit-gallery-container"></div>
+			<div class="modal-footer">
+				<div class="grey-bar"></div>
+				<button id="add-work" class="toggle-modal-view modal-buttons">Ajouter une photo</button>
+				<a href="#" id="delete-gallery">Supprimer la galerie</a>
+			</div>
+		</div>
+		<!-- étape 2 de la fenetre modale -->
+		<div class="add-works-step-modal">
+			<div class="modal-header-two">
+				<a href="#" class="toggle-modal-view back-arrow-icon">
+					<i class="fa-solid fa-arrow-left"></i>
+				</a>
+				<a href="#" class="close-modal modal-trigger">
+					<i class="fa-solid fa-x"></i>
+				</a>
+			</div>
+			<h1 class="modal-title">Ajout photo</h1>
+			<div class="add-works-container"></div>
+			<div class="modal-footer">
+				<div class="grey-bar"></div>
+				<button id="confirm-add-work" class="modal-buttons">Valider</button>
+			</div>
+		</div>
+
 	</div>
 </div>
 <header>

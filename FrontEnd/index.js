@@ -132,4 +132,41 @@ if (sessionStorage.getItem("token") !== null) {
   const openEdit = document.querySelector(".js-modal-edit");
   openEdit.innerHTML += `<i class="fa-regular fa-pen-to-square"></i>
   <p>modifier</p>`;
+
+  // Work In Progress : j'essaye de voir comment travailler sur la modale
+
+  //toggle affiche ou cache la modale
+  const modalContainer = document.querySelector(".modal-container");
+  const modalTriggers = document.querySelectorAll(".modal-trigger");
+
+  modalTriggers.forEach((trigger) =>
+    trigger.addEventListener("click", () => {
+      modalContainer.classList.toggle("active");
+    })
+  );
+
+  //toggle affiche ou cache l'étape 1 ou 2 de la modale
+  const modalToggleView = document.querySelectorAll(".toggle-modal-view");
+  const modalStepOne = document.querySelector(".gallery-step-modal");
+  const modalStepTwo = document.querySelector(".add-works-step-modal");
+
+  modalToggleView.forEach((trigger) =>
+    trigger.addEventListener("click", () => {
+      modalStepOne.classList.toggle("active");
+      modalStepTwo.classList.toggle("active");
+    })
+  );
+
+  //generer projets dans la
+  const galleryContainer = document.querySelector(".edit-gallery-container");
+
+  for (let i in projectList) {
+    let titleProject = projectList[i].title;
+    let src = projectList[i].imageUrl;
+
+    galleryContainer.innerHTML += `<figure class="edit-gallery-work">
+            <img src=${src} alt="${titleProject}}">
+            <figcaption>éditer</figcaption>
+        </figure>`;
+  }
 }
