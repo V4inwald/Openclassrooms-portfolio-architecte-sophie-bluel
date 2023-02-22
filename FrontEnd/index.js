@@ -159,14 +159,53 @@ if (sessionStorage.getItem("token") !== null) {
 
   //generer projets dans la
   const galleryContainer = document.querySelector(".edit-gallery-container");
+  const addWorksContainer = document.querySelector(".add-works-container");
 
   for (let i in projectList) {
     let titleProject = projectList[i].title;
     let src = projectList[i].imageUrl;
+    let projectId = projectList[i].id;
 
     galleryContainer.innerHTML += `<figure class="edit-gallery-work">
             <img src=${src} alt="${titleProject}}">
+            <div class="delete-icon" id="delete-id-${projectId}"><i class="fa-solid fa-trash-can"></i></div>
             <figcaption>éditer</figcaption>
         </figure>`;
+  }
+  // addWorksContainer.innerHTML += `<form class="new-work" action="#" method="post"><div class="new-work-image-container"></div></form>`;
+  generateModalAddWorks(projectCategories);
+}
+
+// Fonction (a déplacer en haut) qui crée le contenu de add works container
+
+function generateModalAddWorks(projectCategories) {
+  const addWorksContainer = document.querySelector(".add-works-container");
+
+  addWorksContainer.innerHTML += `
+  <form class="new-work" action="#" method="post">
+    <div class="new-work-image-container">
+        <div class="new-work-image-icon">
+        <i class="fa-regular fa-image"></i>
+        </div>
+        <label for="upload-work-image" class="upload-work-image-class">+ Ajouter photo</label>
+        <input type="file" id="upload-work-image">
+        <p>jpg, png : 4mo max</p>
+    </div>
+    <label for="title">Titre</label>
+    <input type="text" name="title" id="title">
+    <label for="category">Catégorie</label>
+    <select name="category" id="category">
+  </form>`;
+
+  const selectDynamicCategory = document.querySelector(
+    `select[name="category"]`
+  );
+
+  for (let category in projectCategories) {
+    let categoryName = projectCategories[category].name;
+    let categoryId = projectCategories[category].id;
+
+    selectDynamicCategory.innerHTML += `
+    <option value="category-id-${categoryId}">${categoryName}</option>`;
   }
 }
