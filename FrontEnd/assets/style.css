@@ -250,14 +250,18 @@ margin: auto;
 }
 
 #contact input,
-#connection input {
+#connection input,
+#new-work input,
+#new-work select {
+	font: inherit;
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 #contact label,
-#connection label {
+#connection label,
+#new-work label {
 	margin: 2em 0 1em 0;
 }
 #contact textarea {
@@ -270,17 +274,22 @@ margin: auto;
 	margin-bottom: 7em;
 }
 
-input[type="submit"],
+#contact-submit,
+#login-submit,
 .modal-buttons {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
 	background-color: #1D6154;
-	margin : 2em auto ;
+	margin : 2em auto;
 	width: 180px;
 	text-align: center;
-	border-radius: 60px ;
+	border-radius: 60px;
 	cursor: pointer;
+}
+
+.inactive_button {
+	background-color: #A7A7A7;
 }
 
 .forgotten-password {
@@ -319,9 +328,10 @@ footer nav ul {
 }
 
 .modal {
-	max-width: 630px;
-	width: 400px;
-	max-height: 700px;
+	min-width: 400px;
+	width: 30vw;
+	max-height: 95vh;
+	min-height: 80vh;
 	background-color: white;
 	position: absolute;
 	/* top: 40%; */
@@ -391,7 +401,7 @@ footer nav ul {
 	box-sizing: border-box;
 }
 
-.new-work {
+#new-work {
 	display: flex;
 	justify-content: center;
 	flex-direction: column;
@@ -407,10 +417,34 @@ footer nav ul {
 	border-radius: 3px;
 	padding: 10px 0px;
 	margin-bottom: 1rem;
+	position: relative;
 }
 
 input[type="file"] {
-	display: none;
+	position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+	z-index: -1;
+}
+
+.preview-image {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	z-index: -1;
+	display: flex;
+	justify-content: center;
+}
+
+.preview-image img {
+	max-height: 100%;
+	max-width: 100%;
+	min-width: 45%;
+	object-fit: cover;
 }
 
 .upload-work-image-class {
@@ -489,7 +523,7 @@ input[type="file"] {
 	align-items: center;
 
 }
-/*  */
+/* end */
 .edit-gallery-container {
 	width: 100%;
 	display: grid;

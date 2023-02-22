@@ -172,7 +172,7 @@ if (sessionStorage.getItem("token") !== null) {
             <figcaption>éditer</figcaption>
         </figure>`;
   }
-  // addWorksContainer.innerHTML += `<form class="new-work" action="#" method="post"><div class="new-work-image-container"></div></form>`;
+
   generateModalAddWorks(projectCategories);
 }
 
@@ -182,19 +182,23 @@ function generateModalAddWorks(projectCategories) {
   const addWorksContainer = document.querySelector(".add-works-container");
 
   addWorksContainer.innerHTML += `
-  <form class="new-work" action="#" method="post">
+  <form id="new-work" action="#" method="post">
     <div class="new-work-image-container">
         <div class="new-work-image-icon">
         <i class="fa-regular fa-image"></i>
         </div>
         <label for="upload-work-image" class="upload-work-image-class">+ Ajouter photo</label>
-        <input type="file" id="upload-work-image">
+        <input accept="image/*" type="file" id="upload-work-image" required>
         <p>jpg, png : 4mo max</p>
+        <div class="preview-image">
+          <img id="image-to-upload" src="#" alt="votre image" />
+        </div>
     </div>
     <label for="title">Titre</label>
-    <input type="text" name="title" id="title">
+    <input type="text" name="title" id="title" required>
     <label for="category">Catégorie</label>
-    <select name="category" id="category">
+    <select name="category" id="category" required>
+      <option value=""></option>
   </form>`;
 
   const selectDynamicCategory = document.querySelector(
@@ -208,4 +212,32 @@ function generateModalAddWorks(projectCategories) {
     selectDynamicCategory.innerHTML += `
     <option value="category-id-${categoryId}">${categoryName}</option>`;
   }
+
+  const submitForm = document.querySelector("#confirm-add-work");
+  submitForm.innerHTML += `<input form="new-work" type="submit" value="Valider" id="submit-new-work" class="modal-buttons  inactive_button">`;
 }
+
+const uploadImage = document.querySelector("#upload-work-image");
+const imageToUpload = document.querySelector("#image-to-upload");
+const newWorkImageContainer = document.querySelector(
+  ".new-work-image-container"
+);
+const previewImage = document.querySelector(".preview-image");
+
+newWorkImageContainer.addEventListener("click", (e) => {
+  if (e.target.tagName == "LABEL") return;
+  uploadImage.click();
+});
+
+//quand une image est chargée fait apparaitre le preview
+uploadImage.onchange = (evenement) => {
+  const [file] = uploadImage.files;
+  if (file) {
+    imageToUpload.src = URL.createObjectURL(file);
+    previewImage.style.zIndex = "1";
+    previewImage.classList.add("preview-image-is-visible");
+    document
+      .querySelector("#submit-new-work")
+      .classList.remove("inactive_button");
+  }
+};
