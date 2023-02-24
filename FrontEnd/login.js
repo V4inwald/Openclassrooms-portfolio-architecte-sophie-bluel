@@ -1,5 +1,9 @@
 const loginForm = document.getElementById("connection");
 
+const linksNavigation = document.querySelectorAll("header nav li a");
+const authentication = linksNavigation[2];
+authentication.style.fontWeight = "600";
+
 loginForm.addEventListener("submit", (event) => {
   event.preventDefault();
 
@@ -28,6 +32,6 @@ loginForm.addEventListener("submit", (event) => {
     })
     .catch(() => {
       // console.log(`erreur : ${error}`);
-      alert("Erreur, verifiez votre identifiant ou votre mot de passe");
+      alert("Erreur dans l’identifiant ou le mot de passe");
     });
 });

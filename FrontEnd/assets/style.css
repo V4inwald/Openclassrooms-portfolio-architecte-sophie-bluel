@@ -104,6 +104,44 @@ a {
 li:hover {
 	color: #B1663C;
 }
+
+.js-admin-toolbar-hidden {
+	width: 100%;
+	position: fixed;
+    left: 0;
+    top: 0;
+	
+}
+
+.js-admin-toolbar-visible {
+	background-color: black;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap : 20px;
+	height: 60px;
+
+}
+
+.admin-toolbar-text {
+	color: white;
+	display: flex;
+	gap : 10px;
+	font-size: 16px;
+}
+
+.admin-toolbar-button {
+	background-color: #FFFFFF;
+	color: black;
+	border-radius: 60px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 10px 20px;
+	font-size: 14px;
+	cursor: pointer;
+}
+
 #introduction {
 	display: flex;
 	align-items: center;
@@ -129,10 +167,28 @@ li:hover {
 }
 #portfolio h2 {
 	text-align: center;
-	margin-bottom: 1em;
 }
 
-.project-filters {
+.portfolio-title-layout {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1rem;
+
+}
+
+.js-modal-edit {
+	display: flex;
+	gap: 10px;
+	border: none;
+	font-size: 1rem;
+	padding: 10px;
+	background-color: inherit;
+	cursor: pointer;
+}
+
+.js-project-filters {
 	display: flex;
 	justify-content: center;
 	gap: 10px;
@@ -160,7 +216,7 @@ li:hover {
 	color: #FFFFFF;
 }
 
-.gallery {
+.js-gallery {
 	width: 100%;
 	display: grid;
 	grid-template-columns: 1fr 1fr 1fr;
@@ -168,7 +224,7 @@ li:hover {
 	grid-row-gap: 20px;
 }
 
-.gallery img {
+.js-gallery img {
 	width: 100%;
 
 }
@@ -194,14 +250,18 @@ margin: auto;
 }
 
 #contact input,
-#connection input {
+#connection input,
+#new-work input,
+#new-work select {
+	font: inherit;
 	height: 50px;
 	font-size: 1.2em;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 #contact label,
-#connection label {
+#connection label,
+#new-work label {
 	margin: 2em 0 1em 0;
 }
 #contact textarea {
@@ -214,16 +274,22 @@ margin: auto;
 	margin-bottom: 7em;
 }
 
-input[type="submit"]{
+#contact-submit,
+#login-submit,
+.modal-buttons {
 	font-family: 'Syne';
 	font-weight: 700;
 	color: white;
 	background-color: #1D6154;
-	margin : 2em auto ;
+	margin : 2em auto;
 	width: 180px;
 	text-align: center;
-	border-radius: 60px ;
+	border-radius: 60px;
 	cursor: pointer;
+}
+
+.inactive_button {
+	background-color: #A7A7A7;
 }
 
 .forgotten-password {
@@ -241,3 +307,240 @@ footer nav ul {
 	margin: 2em
 }
 
+.modal-container {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.modal-container.active {
+	display: block;
+}
+
+.overlay {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background: #0000004D;
+}
+
+.modal {
+	min-width: 400px;
+	width: 30vw;
+	max-height: 95vh;
+	background-color: white;
+	position: absolute;
+	/* top: 40%; */
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	padding: 30px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+}
+
+.modal-header-one,
+.modal-header-two {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
+	margin-bottom: 1rem;
+}
+
+.modal-header-one {
+	justify-content: flex-end;
+}
+
+.back-arrow-icon {
+	font-size: 18px;
+}
+
+#delete-gallery {
+	font-family: 'Syne';
+	color:#D65353;
+	font-weight: 400;
+}
+
+.edit-gallery-work {
+	position: relative;
+}
+
+.delete-icon {
+    color: white;
+    background-color: black;
+    position: absolute;
+    z-index: 1;
+    top: 6px;
+    right: 6px;
+    border-radius: 2px;
+	width: 20px;
+	height: 20px;
+	font-size: 12px;
+    display: flex;
+    justify-content: center;
+	align-items: center;
+	cursor: pointer;
+}
+
+.edit-gallery-work {
+	position: relative;
+}
+
+.add-works-container, 
+.new-work-image-container,
+.add-works-container input,
+.add-works-container select {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+#new-work {
+	display: flex;
+	justify-content: center;
+	flex-direction: column;
+}
+
+.new-work-image-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-direction: column;
+	margin-bottom: 1rem;
+	background-color: #E8F1F6;
+	border-radius: 3px;
+	padding: 10px 0px;
+	margin-bottom: 1rem;
+	position: relative;
+}
+
+input[type="file"] {
+	position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    border: 0;
+	z-index: -1;
+}
+
+.preview-image {
+	position: absolute;
+	height: 70%;
+	width: 100%;
+	z-index: -1;
+	display: flex;
+	justify-content: center;
+}
+
+.preview-image-is-visible {
+	height: 100%;
+	width: 100%;
+	z-index: 1;
+}
+
+.preview-image img {
+	max-height: 100%;
+	max-width: 100%;
+	min-width: 45%;
+	object-fit: cover;
+}
+
+.upload-work-image-class {
+	border: none;
+	background-color:#CBD6DC;
+	color: #306685;
+	font-weight: 500;
+	display: inline-block;
+	padding: 10px 30px;
+	border-radius: 50px;
+	cursor: pointer;
+	margin: 7px;
+}
+
+.new-work-image-container p {
+	font-size: 10px;
+	color: #444444;
+}
+
+.new-work-image-icon {
+	font-size: 100px;
+	color: #B9C5CC;
+}
+
+.modal-footer {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+.modal-title {
+	font-family: 'Work Sans';
+	font-size: 26px;
+	font-weight: 400;
+	color: black;
+	margin-bottom: 2.85rem;
+}
+
+.modal-buttons {
+	border-style: none;
+	width: fit-content;
+	padding: 0.65rem 3rem;
+}
+
+#confirm-add-work {
+	margin-bottom: 0px;
+}
+
+.grey-bar {
+	width: 100%;
+	height: 1px;
+	background-color:#B3B3B3;
+	margin-top: 1rem;
+}
+
+.add-works-step-modal,
+.gallery-step-modal {
+	width: 100%;
+	height: 100%;
+}
+
+
+/* On first toggle hides .gallery-step-modal and shows .add-works-step-modal*/
+/* Does the opposite after */
+
+.add-works-step-modal,
+.gallery-step-modal.active {
+	display: none;
+}
+
+.add-works-step-modal.active, 
+.gallery-step-modal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+}
+/* end */
+.edit-gallery-container {
+	width: 100%;
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+	grid-column-gap: 10px;
+	grid-row-gap: 15px;
+
+}
+
+.edit-gallery-work img {
+	width: 100%;
+	/* height: 100px; */
+	object-fit: cover;
+
+}
