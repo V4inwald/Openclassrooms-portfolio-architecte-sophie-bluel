@@ -119,6 +119,12 @@ function generateModalAddWorks(projectCategories) {
       <option value=""></option>
   </form>`;
 
+  const uploadImage = document.querySelector("#upload-work-image");
+  const imageToUpload = document.querySelector("#image-to-upload");
+  const newWorkImageContainer = document.querySelector(
+    ".new-work-image-container"
+  );
+  const previewImage = document.querySelector(".preview-image");
   const selectDynamicCategory = document.querySelector(
     `select[name="category"]`
   );
@@ -135,6 +141,25 @@ function generateModalAddWorks(projectCategories) {
   submitForm.innerHTML += `
   <input form="new-work" type="submit" value="Valider" id="submit-new-work" 
   class="modal-buttons  inactive_button">`;
+
+  //permet de cliquer sur tout le cadre pour charger une image
+  newWorkImageContainer.addEventListener("click", (e) => {
+    if (e.target.tagName == "LABEL") return;
+    uploadImage.click();
+  });
+
+  //quand une image est chargée fait apparaitre le preview
+  uploadImage.onchange = (evenement) => {
+    const [file] = uploadImage.files;
+    if (file) {
+      imageToUpload.src = URL.createObjectURL(file);
+      previewImage.classList.add("preview-image-is-visible");
+      // rends sa couleur normale au bouton
+      document
+        .querySelector("#submit-new-work")
+        .classList.remove("inactive_button");
+    }
+  };
 }
 // fonction qui genere la gallerie de travaux dans la partie 1 de la modale
 function generateModalGallery(projectList, userToken) {
@@ -160,7 +185,6 @@ function generateModalGallery(projectList, userToken) {
     deleteIcon.addEventListener("click", (event) => {
       let idToGet = deleteIcon.id;
       idToGet = idToGet.replace("delete-id-", "");
-      console.log(idToGet);
       deleteWork(idToGet, userToken);
     });
   });
@@ -186,6 +210,51 @@ function deleteWork(projectId, userToken) {
       window.dispatchEvent(new Event("storage"));
     })
     .catch((error) => console.log(`erreur : ${error}`));
+}
+
+// ajoute un nouveau projet
+async function addNewProject(userToken) {
+  const formAddNewProject = document.querySelector("#new-work");
+  const previewImage = document.querySelector(".preview-image");
+
+  formAddNewProject.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const imageForm = document.getElementById("upload-work-image").files[0];
+    const imageType =
+      document.getElementById("upload-work-image").files[0].type;
+    const imageTitle = document.querySelector('input[name="title"]').value;
+    const imageCategory = document.querySelector(
+      'select[name="category"]'
+    ).value;
+
+    const dataForm = new FormData();
+
+    dataForm.append("image", imageForm, imageType);
+    dataForm.append("title", imageTitle);
+    dataForm.append("category", imageCategory);
+
+    fetch("http://localhost:5678/api/works", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: dataForm,
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((responseJson) => {
+        localStorage.removeItem("projectListStored");
+        window.dispatchEvent(new Event("storage"));
+        previewImage.classList.remove("preview-image-is-visible");
+        formAddNewProject.reset();
+      })
+      .catch((error) => console.log(`erreur : ${error}`));
+  });
 }
 
 //mets a jour la liste des projets
@@ -264,78 +333,22 @@ if (sessionStorage.getItem("token") !== null) {
   ////generer la partie 2 de la modale
   generateModalAddWorks(projectCategories);
 
-  const uploadImage = document.querySelector("#upload-work-image");
-  const imageToUpload = document.querySelector("#image-to-upload");
-  const newWorkImageContainer = document.querySelector(
-    ".new-work-image-container"
-  );
-  const previewImage = document.querySelector(".preview-image");
-
-  newWorkImageContainer.addEventListener("click", (e) => {
-    if (e.target.tagName == "LABEL") return;
-    uploadImage.click();
-  });
-
-  //quand une image est chargée fait apparaitre le preview
-  uploadImage.onchange = (evenement) => {
-    const [file] = uploadImage.files;
-    if (file) {
-      imageToUpload.src = URL.createObjectURL(file);
-      previewImage.style.zIndex = "1";
-      previewImage.classList.add("preview-image-is-visible");
-      document
-        .querySelector("#submit-new-work")
-        .classList.remove("inactive_button");
-    }
-  };
-
-  const formAddNewProject = document.querySelector("#new-work");
-  // ajoute un nouveau projet
-  formAddNewProject.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const imageForm = document.getElementById("upload-work-image").files[0];
-    const imageType =
-      document.getElementById("upload-work-image").files[0].type;
-    const imageTitle = document.querySelector('input[name="title"]').value;
-    const imageCategory = document.querySelector(
-      'select[name="category"]'
-    ).value;
-
-    const dataForm = new FormData();
-
-    dataForm.append("image", imageForm, imageType);
-    dataForm.append("title", imageTitle);
-    dataForm.append("category", imageCategory);
-
-    fetch("http://localhost:5678/api/works", {
-      method: "POST",
-      headers: {
-        accept: "application/json",
-        Authorization: `Bearer ${userToken}`,
-      },
-      body: dataForm,
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((responseJson) => {
-        console.log(responseJson);
-        localStorage.removeItem("projectListStored");
-        window.dispatchEvent(new Event("storage"));
-      })
-      .catch((error) => console.log(`erreur : ${error}`));
-  });
+  //ajoute un nouveau projet
+  addNewProject(userToken);
 
   //s'active quand localStorage change
   window.addEventListener("storage", async () => {
-    console.log("working");
     let newProjectList = await majProjectList();
-
-    console.log(newProjectList);
     genererProjets(newProjectList);
     generateModalGallery(newProjectList, userToken);
+  });
+
+  //delete every project
+  const deleteAllProjects = document.querySelector("#delete-gallery");
+  deleteAllProjects.addEventListener("click", () => {
+    console.log(projectList);
+    for (let i in projectList) {
+      deleteWork(projectList[i].id, userToken);
+    }
   });
 }
