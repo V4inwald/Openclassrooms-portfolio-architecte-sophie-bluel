@@ -1,9 +1,9 @@
 // --------------------- Je récupère les données du serveur ---------------------
 
 //Récupere la liste des projets et catégories dans le localStorage
+
 let projectList = window.localStorage.getItem("projectListStored");
 let projectCategories = window.localStorage.getItem("projectCategoriesStored");
-
 //Si pas dans le localStorage les demande a l'API et les stocke
 if (projectList === null || projectCategories === null) {
   // Liste des projets
@@ -14,7 +14,6 @@ if (projectList === null || projectCategories === null) {
     "http://localhost:5678/api/categories"
   );
   projectCategories = await responseCategories.json();
-
   // Transformation des listes en JSON
   const stringProjectList = JSON.stringify(projectList);
   const stringCategoriesList = JSON.stringify(projectCategories);
@@ -94,6 +93,50 @@ for (let button of filterButtons) {
 }
 
 // --------------------- Fenetre modale et espace administrateur ---------------------
+
+// Fonction (a déplacer en haut) qui crée le contenu de add works container
+
+function generateModalAddWorks(projectCategories) {
+  const addWorksContainer = document.querySelector(".add-works-container");
+
+  addWorksContainer.innerHTML += `
+  <form id="new-work" action="#" method="post">
+    <div class="new-work-image-container">
+        <div class="new-work-image-icon">
+        <i class="fa-regular fa-image"></i>
+        </div>
+        <label for="upload-work-image" class="upload-work-image-class">+ Ajouter photo</label>
+        <input accept="image/*" type="file" id="upload-work-image" required>
+        <p>jpg, png : 4mo max</p>
+        <div class="preview-image">
+          <img id="image-to-upload" src="#" alt="votre image" />
+        </div>
+    </div>
+    <label for="title">Titre</label>
+    <input type="text" name="title" id="title" required>
+    <label for="category">Catégorie</label>
+    <select name="category" id="category" required>
+      <option value=""></option>
+  </form>`;
+
+  const selectDynamicCategory = document.querySelector(
+    `select[name="category"]`
+  );
+
+  for (let category in projectCategories) {
+    let categoryName = projectCategories[category].name;
+    let categoryId = projectCategories[category].id;
+
+    selectDynamicCategory.innerHTML += `
+    <option value="${categoryId}">${categoryName}</option>`;
+  }
+
+  const submitForm = document.querySelector("#confirm-add-work");
+  submitForm.innerHTML += `
+  <input form="new-work" type="submit" value="Valider" id="submit-new-work" 
+  class="modal-buttons  inactive_button">`;
+}
+
 // Je verifie si il y a un tocken, si oui j'affiche la fenetre modale
 
 if (sessionStorage.getItem("token") !== null) {
@@ -133,8 +176,6 @@ if (sessionStorage.getItem("token") !== null) {
   openEdit.innerHTML += `<i class="fa-regular fa-pen-to-square"></i>
   <p>modifier</p>`;
 
-  // Work In Progress : j'essaye de voir comment travailler sur la modale
-
   //toggle affiche ou cache la modale
   const modalContainer = document.querySelector(".modal-container");
   const modalTriggers = document.querySelectorAll(".modal-trigger");
@@ -157,9 +198,8 @@ if (sessionStorage.getItem("token") !== null) {
     })
   );
 
-  //generer projets dans la
+  //generer projets dans la modale (partie 1)
   const galleryContainer = document.querySelector(".edit-gallery-container");
-  const addWorksContainer = document.querySelector(".add-works-container");
 
   for (let i in projectList) {
     let titleProject = projectList[i].title;
@@ -174,70 +214,104 @@ if (sessionStorage.getItem("token") !== null) {
   }
 
   generateModalAddWorks(projectCategories);
-}
 
-// Fonction (a déplacer en haut) qui crée le contenu de add works container
-
-function generateModalAddWorks(projectCategories) {
-  const addWorksContainer = document.querySelector(".add-works-container");
-
-  addWorksContainer.innerHTML += `
-  <form id="new-work" action="#" method="post">
-    <div class="new-work-image-container">
-        <div class="new-work-image-icon">
-        <i class="fa-regular fa-image"></i>
-        </div>
-        <label for="upload-work-image" class="upload-work-image-class">+ Ajouter photo</label>
-        <input accept="image/*" type="file" id="upload-work-image" required>
-        <p>jpg, png : 4mo max</p>
-        <div class="preview-image">
-          <img id="image-to-upload" src="#" alt="votre image" />
-        </div>
-    </div>
-    <label for="title">Titre</label>
-    <input type="text" name="title" id="title" required>
-    <label for="category">Catégorie</label>
-    <select name="category" id="category" required>
-      <option value=""></option>
-  </form>`;
-
-  const selectDynamicCategory = document.querySelector(
-    `select[name="category"]`
+  const uploadImage = document.querySelector("#upload-work-image");
+  const imageToUpload = document.querySelector("#image-to-upload");
+  const newWorkImageContainer = document.querySelector(
+    ".new-work-image-container"
   );
+  const previewImage = document.querySelector(".preview-image");
 
-  for (let category in projectCategories) {
-    let categoryName = projectCategories[category].name;
-    let categoryId = projectCategories[category].id;
+  newWorkImageContainer.addEventListener("click", (e) => {
+    if (e.target.tagName == "LABEL") return;
+    uploadImage.click();
+  });
 
-    selectDynamicCategory.innerHTML += `
-    <option value="category-id-${categoryId}">${categoryName}</option>`;
+  //quand une image est chargée fait apparaitre le preview
+  uploadImage.onchange = (evenement) => {
+    const [file] = uploadImage.files;
+    if (file) {
+      imageToUpload.src = URL.createObjectURL(file);
+      previewImage.style.zIndex = "1";
+      previewImage.classList.add("preview-image-is-visible");
+      document
+        .querySelector("#submit-new-work")
+        .classList.remove("inactive_button");
+    }
+  };
+
+  const formAddNewProject = document.querySelector("#new-work");
+  // ajoute un nouveau projet
+  formAddNewProject.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const imageForm = document.getElementById("upload-work-image").files[0];
+    const imageType =
+      document.getElementById("upload-work-image").files[0].type;
+    const imageTitle = document.querySelector('input[name="title"]').value;
+    const imageCategory = document.querySelector(
+      'select[name="category"]'
+    ).value;
+
+    const dataForm = new FormData();
+
+    dataForm.append("image", imageForm, imageType);
+    dataForm.append("title", imageTitle);
+    dataForm.append("category", imageCategory);
+
+    fetch("http://localhost:5678/api/works", {
+      method: "POST",
+      headers: {
+        accept: "application/json",
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: dataForm,
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+      })
+      .then((responseJson) => {
+        console.log(responseJson);
+      })
+      .catch((error) => console.log(`erreur : ${error}`));
+  });
+
+  const allDeleteIcon = document.querySelectorAll(".delete-icon");
+
+  for (let i of allDeleteIcon) {
+    //récupère id cliqué puis lance fonction qui supprime les travaux
+    i.addEventListener("click", () => {
+      let idToGet = i.id;
+      idToGet = idToGet.replace("delete-id-", "");
+      deleteWork(idToGet, userToken);
+    });
   }
-
-  const submitForm = document.querySelector("#confirm-add-work");
-  submitForm.innerHTML += `<input form="new-work" type="submit" value="Valider" id="submit-new-work" class="modal-buttons  inactive_button">`;
 }
 
-const uploadImage = document.querySelector("#upload-work-image");
-const imageToUpload = document.querySelector("#image-to-upload");
-const newWorkImageContainer = document.querySelector(
-  ".new-work-image-container"
-);
-const previewImage = document.querySelector(".preview-image");
+// supprime projet dont l'id est entré
+function deleteWork(projectId, userToken) {
+  fetch(`http://localhost:5678/api/works/${projectId}`, {
+    method: "DELETE",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${userToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response;
+      }
+    })
+    .then((responseJson) => {
+      console.log("suppression réussie");
+    })
+    .catch((error) => console.log(`erreur : ${error}`));
+}
 
-newWorkImageContainer.addEventListener("click", (e) => {
-  if (e.target.tagName == "LABEL") return;
-  uploadImage.click();
+// console.log(projectList);
+
+window.addEventListener("storage", () => {
+  console.log("something happened");
 });
-
-//quand une image est chargée fait apparaitre le preview
-uploadImage.onchange = (evenement) => {
-  const [file] = uploadImage.files;
-  if (file) {
-    imageToUpload.src = URL.createObjectURL(file);
-    previewImage.style.zIndex = "1";
-    previewImage.classList.add("preview-image-is-visible");
-    document
-      .querySelector("#submit-new-work")
-      .classList.remove("inactive_button");
-  }
-};
