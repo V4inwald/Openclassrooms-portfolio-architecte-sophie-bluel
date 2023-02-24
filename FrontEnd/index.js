@@ -27,14 +27,15 @@ if (projectList === null || projectCategories === null) {
 
 // Genère dynamiquement les projets
 function genererProjets(projectsToGenerate) {
+  const jsGallery = document.querySelector(".js-gallery");
+  jsGallery.innerHTML = "";
+
   for (let i in projectsToGenerate) {
     let category = projectsToGenerate[i].categoryId;
     let titleProject = projectsToGenerate[i].title;
     let src = projectsToGenerate[i].imageUrl;
 
-    document.querySelector(
-      ".js-gallery"
-    ).innerHTML += `<figure class=category-${category}>
+    jsGallery.innerHTML += `<figure class=category-${category}>
           <img src=${src} alt="${titleProject}}">
           <figcaption>${titleProject}</figcaption>
       </figure>`;
@@ -86,8 +87,7 @@ for (let button of filterButtons) {
         }
       }
     }
-    // actualise l'affichage
-    document.querySelector(".js-gallery").innerHTML = "";
+
     genererProjets(filteredProjects);
   });
 }
@@ -135,6 +135,66 @@ function generateModalAddWorks(projectCategories) {
   submitForm.innerHTML += `
   <input form="new-work" type="submit" value="Valider" id="submit-new-work" 
   class="modal-buttons  inactive_button">`;
+}
+// fonction qui genere la gallerie de travaux dans la partie 1 de la modale
+function generateModalGallery(projectList, userToken) {
+  const galleryContainer = document.querySelector(".edit-gallery-container");
+  galleryContainer.innerHTML = "";
+
+  for (let i in projectList) {
+    let titleProject = projectList[i].title;
+    let src = projectList[i].imageUrl;
+    let projectId = projectList[i].id;
+
+    galleryContainer.innerHTML += `<figure class="edit-gallery-work">
+            <img src=${src} alt="${titleProject}}">
+            <div class="delete-icon" id="delete-id-${projectId}"><i class="fa-solid fa-trash-can"></i></div>
+            <figcaption>éditer</figcaption>
+        </figure>`;
+  }
+
+  const allDeleteIcon = document.querySelectorAll(".delete-icon");
+
+  allDeleteIcon.forEach((deleteIcon) => {
+    //récupère id cliqué puis lance fonction qui supprime les travaux
+    deleteIcon.addEventListener("click", (event) => {
+      let idToGet = deleteIcon.id;
+      idToGet = idToGet.replace("delete-id-", "");
+      console.log(idToGet);
+      deleteWork(idToGet, userToken);
+    });
+  });
+}
+
+// supprime projet dont l'id est entré
+function deleteWork(projectId, userToken) {
+  fetch(`http://localhost:5678/api/works/${projectId}`, {
+    method: "DELETE",
+    headers: {
+      accept: "application/json",
+      Authorization: `Bearer ${userToken}`,
+    },
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response;
+      }
+    })
+    .then((response) => {
+      console.log("suppression réussie");
+      localStorage.removeItem("projectListStored");
+      window.dispatchEvent(new Event("storage"));
+    })
+    .catch((error) => console.log(`erreur : ${error}`));
+}
+
+//mets a jour la liste des projets
+async function majProjectList() {
+  const response = await fetch("http://localhost:5678/api/works");
+  projectList = await response.json();
+  const stringProjectList = JSON.stringify(projectList);
+  window.localStorage.setItem("projectListStored", stringProjectList);
+  return projectList;
 }
 
 // Je verifie si il y a un tocken, si oui j'affiche la fenetre modale
@@ -199,20 +259,9 @@ if (sessionStorage.getItem("token") !== null) {
   );
 
   //generer projets dans la modale (partie 1)
-  const galleryContainer = document.querySelector(".edit-gallery-container");
+  generateModalGallery(projectList, userToken);
 
-  for (let i in projectList) {
-    let titleProject = projectList[i].title;
-    let src = projectList[i].imageUrl;
-    let projectId = projectList[i].id;
-
-    galleryContainer.innerHTML += `<figure class="edit-gallery-work">
-            <img src=${src} alt="${titleProject}}">
-            <div class="delete-icon" id="delete-id-${projectId}"><i class="fa-solid fa-trash-can"></i></div>
-            <figcaption>éditer</figcaption>
-        </figure>`;
-  }
-
+  ////generer la partie 2 de la modale
   generateModalAddWorks(projectCategories);
 
   const uploadImage = document.querySelector("#upload-work-image");
@@ -274,44 +323,19 @@ if (sessionStorage.getItem("token") !== null) {
       })
       .then((responseJson) => {
         console.log(responseJson);
+        localStorage.removeItem("projectListStored");
+        window.dispatchEvent(new Event("storage"));
       })
       .catch((error) => console.log(`erreur : ${error}`));
   });
 
-  const allDeleteIcon = document.querySelectorAll(".delete-icon");
+  //s'active quand localStorage change
+  window.addEventListener("storage", async () => {
+    console.log("working");
+    let newProjectList = await majProjectList();
 
-  for (let i of allDeleteIcon) {
-    //récupère id cliqué puis lance fonction qui supprime les travaux
-    i.addEventListener("click", () => {
-      let idToGet = i.id;
-      idToGet = idToGet.replace("delete-id-", "");
-      deleteWork(idToGet, userToken);
-    });
-  }
+    console.log(newProjectList);
+    genererProjets(newProjectList);
+    generateModalGallery(newProjectList, userToken);
+  });
 }
-
-// supprime projet dont l'id est entré
-function deleteWork(projectId, userToken) {
-  fetch(`http://localhost:5678/api/works/${projectId}`, {
-    method: "DELETE",
-    headers: {
-      accept: "application/json",
-      Authorization: `Bearer ${userToken}`,
-    },
-  })
-    .then((response) => {
-      if (response.ok) {
-        return response;
-      }
-    })
-    .then((responseJson) => {
-      console.log("suppression réussie");
-    })
-    .catch((error) => console.log(`erreur : ${error}`));
-}
-
-// console.log(projectList);
-
-window.addEventListener("storage", () => {
-  console.log("something happened");
-});
