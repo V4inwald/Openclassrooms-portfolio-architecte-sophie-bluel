@@ -46,7 +46,7 @@ function genererProjets(projectsToGenerate) {
 function genererFiltres(filtersToGenerate) {
   const filterContainer = document.querySelector(".js-project-filters");
 
-  filterContainer.innerHTML += `<button class="filter-button">Tous</button>`;
+  filterContainer.innerHTML += `<button class="filter-button filter-button-initial">Tous</button>`;
 
   for (let i in filtersToGenerate) {
     let filterId = filtersToGenerate[i].id;
@@ -64,10 +64,13 @@ genererProjets(projectList);
 genererFiltres(projectCategories);
 
 const filterButtons = document.getElementsByClassName("filter-button");
+const styleAllButton = document.querySelector(".filter-button-initial");
 
 //Réponds au click sur un boutton des filtres
 for (let button of filterButtons) {
   button.addEventListener("click", () => {
+    //supprime la couleur "activée" du bouton tous
+    styleAllButton.classList.remove("filter-button-initial");
     //crée une variable category depuis l'id du bouton (0 represente le bouton Tous)
     let category = 0;
     //Compare le bouton cliqué avec la classe du bouton qui indique la catégorie
@@ -94,8 +97,7 @@ for (let button of filterButtons) {
 
 // --------------------- Fenetre modale et espace administrateur ---------------------
 
-// Fonction (a déplacer en haut) qui crée le contenu de add works container
-
+// Fonction qui crée le contenu de add works container
 function generateModalAddWorks(projectCategories) {
   const addWorksContainer = document.querySelector(".add-works-container");
 
@@ -328,6 +330,7 @@ if (sessionStorage.getItem("token") !== null) {
   );
 
   //generer projets dans la modale (partie 1)
+  // appele la fonction deleteWork en cas de click sur supprimer
   generateModalGallery(projectList, userToken);
 
   ////generer la partie 2 de la modale

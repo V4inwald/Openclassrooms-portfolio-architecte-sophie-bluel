@@ -211,6 +211,7 @@ li:hover {
 
 }
 
+.filter-button-initial, 
 .filter-button:focus {
 	background-color: #1D6154;
 	color: #FFFFFF;
