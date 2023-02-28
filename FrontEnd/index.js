@@ -108,11 +108,12 @@ function generateModalAddWorks(projectCategories) {
         <i class="fa-regular fa-image"></i>
         </div>
         <label for="upload-work-image" class="upload-work-image-class">+ Ajouter photo</label>
-        <input accept="image/*" type="file" id="upload-work-image" required>
+        <input accept=".png, .jpeg, .jpg" type="file" id="upload-work-image" required>
         <p>jpg, png : 4mo max</p>
         <div class="preview-image">
           <img id="image-to-upload" src="#" alt="votre image" />
         </div>
+        <div class="error-box-to-big">Le fichier est trop lourd, il doit faire 4Mo au maximum</div>
     </div>
     <label for="title">Titre</label>
     <input type="text" name="title" id="title" required>
@@ -150,16 +151,32 @@ function generateModalAddWorks(projectCategories) {
     uploadImage.click();
   });
 
-  //quand une image est chargée fait apparaitre le preview
   uploadImage.onchange = (evenement) => {
     const [file] = uploadImage.files;
     if (file) {
-      imageToUpload.src = URL.createObjectURL(file);
-      previewImage.classList.add("preview-image-is-visible");
-      // rends sa couleur normale au bouton
-      document
-        .querySelector("#submit-new-work")
-        .classList.remove("inactive_button");
+      if (file.size > 4194304) {
+        //affiche le message d'erreur si image trop lourde
+        const errorMessage = document.querySelector(".error-box-to-big");
+        errorMessage.style.zIndex = "1";
+        errorMessage.style.visibility = "visible";
+        errorMessage.style.animation = "appear 0.2s";
+        window.setTimeout(() => {
+          errorMessage.style.animation = "disappear 0.5s";
+          window.setTimeout(() => {
+            errorMessage.style.visibility = "hidden";
+          }, 500);
+        }, "4000");
+        //réinitialise l'input
+        uploadImage.value = "";
+      } else {
+        //quand une image est chargée fait apparaitre le preview
+        imageToUpload.src = URL.createObjectURL(file);
+        previewImage.classList.add("preview-image-is-visible");
+        // rends sa couleur normale au bouton
+        document
+          .querySelector("#submit-new-work")
+          .classList.remove("inactive_button");
+      }
     }
   };
 }
@@ -204,10 +221,14 @@ function deleteWork(projectId, userToken) {
     .then((response) => {
       if (response.ok) {
         return response;
+      } else if (response.status == 401) {
+        /*si non autorisé et donc que le token est 
+        expiré le supprime et recharge la page*/
+        window.sessionStorage.removeItem("token");
+        location.reload();
       }
     })
     .then((response) => {
-      console.log("suppression réussie");
       localStorage.removeItem("projectListStored");
       window.dispatchEvent(new Event("storage"));
     })
@@ -247,6 +268,11 @@ async function addNewProject(userToken) {
       .then((response) => {
         if (response.ok) {
           return response.json();
+        } else if (response.status == 401) {
+          /*si non autorisé et donc que le token est 
+          expiré le supprime et recharge la page*/
+          window.sessionStorage.removeItem("token");
+          location.reload();
         }
       })
       .then((responseJson) => {
@@ -254,6 +280,13 @@ async function addNewProject(userToken) {
         window.dispatchEvent(new Event("storage"));
         previewImage.classList.remove("preview-image-is-visible");
         formAddNewProject.reset();
+
+        //toggle afin d'afficher la partie 1 de la modale et non la 2
+        const modalStepOne = document.querySelector(".gallery-step-modal");
+        const modalStepTwo = document.querySelector(".add-works-step-modal");
+
+        modalStepOne.classList.toggle("active");
+        modalStepTwo.classList.toggle("active");
       })
       .catch((error) => console.log(`erreur : ${error}`));
   });
@@ -339,11 +372,17 @@ if (sessionStorage.getItem("token") !== null) {
   //ajoute un nouveau projet
   addNewProject(userToken);
 
-  //s'active quand localStorage change
+  //s'active quand le sessionStorage ou le localStorage change
   window.addEventListener("storage", async () => {
-    let newProjectList = await majProjectList();
-    genererProjets(newProjectList);
-    generateModalGallery(newProjectList, userToken);
+    // si le token n'est plus la dans le sessionStorage se deconnecte
+    if (sessionStorage.getItem("token") == null) {
+      location.reload();
+    } else {
+      // si le localStorage change, actualise la liste des projets
+      let newProjectList = await majProjectList();
+      genererProjets(newProjectList);
+      generateModalGallery(newProjectList, userToken);
+    }
   });
 
   //delete every project
@@ -355,3 +394,5 @@ if (sessionStorage.getItem("token") !== null) {
     }
   });
 }
+
+// const modalTestEffect = document.querySelector(".modal");
