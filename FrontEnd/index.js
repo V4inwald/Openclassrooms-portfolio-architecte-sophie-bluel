@@ -26,7 +26,7 @@ if (projectList === null || projectCategories === null) {
 }
 
 // Genère dynamiquement les projets
-function genererProjets(projectsToGenerate) {
+function generateProjects(projectsToGenerate) {
   const jsGallery = document.querySelector(".js-gallery");
   jsGallery.innerHTML = "";
 
@@ -43,10 +43,10 @@ function genererProjets(projectsToGenerate) {
 }
 
 //genere le filtres depuis la liste des categories
-function genererFiltres(filtersToGenerate) {
+function generateFilters(filtersToGenerate) {
   const filterContainer = document.querySelector(".js-project-filters");
 
-  filterContainer.innerHTML += `<button class="filter-button filter-button-initial">Tous</button>`;
+  filterContainer.innerHTML += `<button class="filter-button filter-button-active">Tous</button>`;
 
   for (let i in filtersToGenerate) {
     let filterId = filtersToGenerate[i].id;
@@ -57,20 +57,23 @@ function genererFiltres(filtersToGenerate) {
 }
 
 // Genère tout les projets
-genererProjets(projectList);
+generateProjects(projectList);
 
 // --------------------- Les filtres ---------------------
 
-genererFiltres(projectCategories);
+generateFilters(projectCategories);
 
 const filterButtons = document.getElementsByClassName("filter-button");
-const styleAllButton = document.querySelector(".filter-button-initial");
 
 //Réponds au click sur un boutton des filtres
 for (let button of filterButtons) {
   button.addEventListener("click", () => {
-    //supprime la couleur "activée" du bouton tous
-    styleAllButton.classList.remove("filter-button-initial");
+    /*supprime la couleur "activée" du dernier bouton 
+    et l'ajoute au nouveau bouton clické*/
+    document
+      .querySelector(".filter-button-active")
+      .classList.remove("filter-button-active");
+    button.classList.add("filter-button-active");
     //crée une variable category depuis l'id du bouton (0 represente le bouton Tous)
     let category = 0;
     //Compare le bouton cliqué avec la classe du bouton qui indique la catégorie
@@ -82,7 +85,7 @@ for (let button of filterButtons) {
     //copie la liste des projets pour ne pas modifier la liste initiale
     let filteredProjects = Array.from(projectList);
 
-    //Trie la liste selon la catégorie, le bouton Tous (cathégorie 0) ne fait rien
+    //Trie la liste selon la catégorie, le bouton Tous (catégorie 0) ne fait rien
     if (category != 0) {
       for (let j = filteredProjects.length - 1; j >= 0; j--) {
         if (filteredProjects[j].categoryId != category) {
@@ -91,7 +94,7 @@ for (let button of filterButtons) {
       }
     }
 
-    genererProjets(filteredProjects);
+    generateProjects(filteredProjects);
   });
 }
 
@@ -282,11 +285,12 @@ async function addNewProject(userToken) {
         formAddNewProject.reset();
 
         //toggle afin d'afficher la partie 1 de la modale et non la 2
-        const modalStepOne = document.querySelector(".gallery-step-modal");
-        const modalStepTwo = document.querySelector(".add-works-step-modal");
-
-        modalStepOne.classList.toggle("active");
-        modalStepTwo.classList.toggle("active");
+        document
+          .querySelector(".gallery-step-modal")
+          .classList.toggle("active");
+        document
+          .querySelector(".add-works-step-modal")
+          .classList.toggle("active");
       })
       .catch((error) => console.log(`erreur : ${error}`));
   });
@@ -305,14 +309,24 @@ async function majProjectList() {
 
 if (sessionStorage.getItem("token") !== null) {
   const userToken = sessionStorage.getItem("token");
+  const hideFilters = document.querySelector(".js-project-filters");
+  const linksNavigation = document.querySelectorAll("header nav li a");
+  const authentication = linksNavigation[2];
+  const modalElementEdition = document.querySelector(
+    ".js-admin-toolbar-hidden"
+  );
+  const openEdit = document.querySelector(".js-modal-edit");
+  const modalContainer = document.querySelector(".modal-container");
+  const modalTriggers = document.querySelectorAll(".modal-trigger");
+  const modalToggleView = document.querySelectorAll(".toggle-modal-view");
+  const modalStepOne = document.querySelector(".gallery-step-modal");
+  const modalStepTwo = document.querySelector(".add-works-step-modal");
+  const deleteAllProjects = document.querySelector("#delete-gallery");
 
   //cacher les filtres
-  const hideFilters = document.querySelector(".js-project-filters");
   hideFilters.style.display = "none";
 
   //changer login en logout
-  const linksNavigation = document.querySelectorAll("header nav li a");
-  const authentication = linksNavigation[2];
   authentication.innerHTML = "logout";
 
   //lors du logout je supprime le token
@@ -323,9 +337,6 @@ if (sessionStorage.getItem("token") !== null) {
   });
 
   //Ajoute la bande noire en haut de la page
-  const modalElementEdition = document.querySelector(
-    ".js-admin-toolbar-hidden"
-  );
   modalElementEdition.innerHTML += `<div class="admin-toolbar-text"><i class="fa-regular fa-pen-to-square"></i>
   <p>Mode édition</p></div> 
   <button class="admin-toolbar-button">publier les changements</button>`;
@@ -336,14 +347,11 @@ if (sessionStorage.getItem("token") !== null) {
     .querySelector(".portfolio-title-layout")
     .setAttribute("style", "margin-bottom:3em");
 
-  const openEdit = document.querySelector(".js-modal-edit");
+  //bouton modifier
   openEdit.innerHTML += `<i class="fa-regular fa-pen-to-square"></i>
   <p>modifier</p>`;
 
   //toggle affiche ou cache la modale
-  const modalContainer = document.querySelector(".modal-container");
-  const modalTriggers = document.querySelectorAll(".modal-trigger");
-
   modalTriggers.forEach((trigger) =>
     trigger.addEventListener("click", () => {
       modalContainer.classList.toggle("active");
@@ -351,10 +359,6 @@ if (sessionStorage.getItem("token") !== null) {
   );
 
   //toggle affiche ou cache l'étape 1 ou 2 de la modale
-  const modalToggleView = document.querySelectorAll(".toggle-modal-view");
-  const modalStepOne = document.querySelector(".gallery-step-modal");
-  const modalStepTwo = document.querySelector(".add-works-step-modal");
-
   modalToggleView.forEach((trigger) =>
     trigger.addEventListener("click", () => {
       modalStepOne.classList.toggle("active");
@@ -380,13 +384,12 @@ if (sessionStorage.getItem("token") !== null) {
     } else {
       // si le localStorage change, actualise la liste des projets
       let newProjectList = await majProjectList();
-      genererProjets(newProjectList);
+      generateProjects(newProjectList);
       generateModalGallery(newProjectList, userToken);
     }
   });
 
   //delete every project
-  const deleteAllProjects = document.querySelector("#delete-gallery");
   deleteAllProjects.addEventListener("click", () => {
     console.log(projectList);
     for (let i in projectList) {
@@ -394,5 +397,3 @@ if (sessionStorage.getItem("token") !== null) {
     }
   });
 }
-
-// const modalTestEffect = document.querySelector(".modal");
