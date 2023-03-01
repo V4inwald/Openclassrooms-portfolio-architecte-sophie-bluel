@@ -29,9 +29,9 @@ Afin de tester le compte administrateur nous disposons d'un compte de test dont 
 ```
 email: sophie.bluel@test.tld
 
-password: S0phie
+mot de passe: S0phie
 ```
 
 ## Environment de developpement
 
-Ce projet a été developpé avec Visual Studio Code avec les plugins suivants: [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer), [W3C Web Validator](https://marketplace.visualstudio.com/items?itemName=CelianRiboulet.webvalidator), [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) and [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+Ce projet a été developpé avec Visual Studio Code avec les plugins suivants: [Live Server](https://marketplace.visualstudio.com/items?itemName=ritwickdey.LiveServer), [W3C Web Validator](https://marketplace.visualstudio.com/items?itemName=CelianRiboulet.webvalidator), [GitLens](https://marketplace.visualstudio.com/items?itemName=eamodio.gitlens) et [Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
