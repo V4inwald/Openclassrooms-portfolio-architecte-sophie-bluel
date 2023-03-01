@@ -26,7 +26,7 @@ if (projectList === null || projectCategories === null) {
 }
 
 // Genère dynamiquement les projets
-function genererProjets(projectsToGenerate) {
+function generateProjects(projectsToGenerate) {
   const jsGallery = document.querySelector(".js-gallery");
   jsGallery.innerHTML = "";
 
@@ -43,10 +43,10 @@ function genererProjets(projectsToGenerate) {
 }
 
 //genere le filtres depuis la liste des categories
-function genererFiltres(filtersToGenerate) {
+function generateFilters(filtersToGenerate) {
   const filterContainer = document.querySelector(".js-project-filters");
 
-  filterContainer.innerHTML += `<button class="filter-button">Tous</button>`;
+  filterContainer.innerHTML += `<button class="filter-button filter-button-active">Tous</button>`;
 
   for (let i in filtersToGenerate) {
     let filterId = filtersToGenerate[i].id;
@@ -57,17 +57,23 @@ function genererFiltres(filtersToGenerate) {
 }
 
 // Genère tout les projets
-genererProjets(projectList);
+generateProjects(projectList);
 
 // --------------------- Les filtres ---------------------
 
-genererFiltres(projectCategories);
+generateFilters(projectCategories);
 
 const filterButtons = document.getElementsByClassName("filter-button");
 
 //Réponds au click sur un boutton des filtres
 for (let button of filterButtons) {
   button.addEventListener("click", () => {
+    /*supprime la couleur "activée" du dernier bouton 
+    et l'ajoute au nouveau bouton clické*/
+    document
+      .querySelector(".filter-button-active")
+      .classList.remove("filter-button-active");
+    button.classList.add("filter-button-active");
     //crée une variable category depuis l'id du bouton (0 represente le bouton Tous)
     let category = 0;
     //Compare le bouton cliqué avec la classe du bouton qui indique la catégorie
@@ -79,7 +85,7 @@ for (let button of filterButtons) {
     //copie la liste des projets pour ne pas modifier la liste initiale
     let filteredProjects = Array.from(projectList);
 
-    //Trie la liste selon la catégorie, le bouton Tous (cathégorie 0) ne fait rien
+    //Trie la liste selon la catégorie, le bouton Tous (catégorie 0) ne fait rien
     if (category != 0) {
       for (let j = filteredProjects.length - 1; j >= 0; j--) {
         if (filteredProjects[j].categoryId != category) {
@@ -88,14 +94,13 @@ for (let button of filterButtons) {
       }
     }
 
-    genererProjets(filteredProjects);
+    generateProjects(filteredProjects);
   });
 }
 
 // --------------------- Fenetre modale et espace administrateur ---------------------
 
-// Fonction (a déplacer en haut) qui crée le contenu de add works container
-
+// Fonction qui crée le contenu de add works container
 function generateModalAddWorks(projectCategories) {
   const addWorksContainer = document.querySelector(".add-works-container");
 
@@ -106,11 +111,12 @@ function generateModalAddWorks(projectCategories) {
         <i class="fa-regular fa-image"></i>
         </div>
         <label for="upload-work-image" class="upload-work-image-class">+ Ajouter photo</label>
-        <input accept="image/*" type="file" id="upload-work-image" required>
+        <input accept=".png, .jpeg, .jpg" type="file" id="upload-work-image" required>
         <p>jpg, png : 4mo max</p>
         <div class="preview-image">
           <img id="image-to-upload" src="#" alt="votre image" />
         </div>
+        <div class="error-box-to-big">Le fichier est trop lourd, il doit faire 4Mo au maximum</div>
     </div>
     <label for="title">Titre</label>
     <input type="text" name="title" id="title" required>
@@ -148,16 +154,32 @@ function generateModalAddWorks(projectCategories) {
     uploadImage.click();
   });
 
-  //quand une image est chargée fait apparaitre le preview
   uploadImage.onchange = (evenement) => {
     const [file] = uploadImage.files;
     if (file) {
-      imageToUpload.src = URL.createObjectURL(file);
-      previewImage.classList.add("preview-image-is-visible");
-      // rends sa couleur normale au bouton
-      document
-        .querySelector("#submit-new-work")
-        .classList.remove("inactive_button");
+      if (file.size > 4194304) {
+        //affiche le message d'erreur si image trop lourde
+        const errorMessage = document.querySelector(".error-box-to-big");
+        errorMessage.style.zIndex = "1";
+        errorMessage.style.visibility = "visible";
+        errorMessage.style.animation = "appear 0.2s";
+        window.setTimeout(() => {
+          errorMessage.style.animation = "disappear 0.5s";
+          window.setTimeout(() => {
+            errorMessage.style.visibility = "hidden";
+          }, 500);
+        }, "4000");
+        //réinitialise l'input
+        uploadImage.value = "";
+      } else {
+        //quand une image est chargée fait apparaitre le preview
+        imageToUpload.src = URL.createObjectURL(file);
+        previewImage.classList.add("preview-image-is-visible");
+        // rends sa couleur normale au bouton
+        document
+          .querySelector("#submit-new-work")
+          .classList.remove("inactive_button");
+      }
     }
   };
 }
@@ -202,10 +224,14 @@ function deleteWork(projectId, userToken) {
     .then((response) => {
       if (response.ok) {
         return response;
+      } else if (response.status == 401) {
+        /*si non autorisé et donc que le token est 
+        expiré le supprime et recharge la page*/
+        window.sessionStorage.removeItem("token");
+        location.reload();
       }
     })
     .then((response) => {
-      console.log("suppression réussie");
       localStorage.removeItem("projectListStored");
       window.dispatchEvent(new Event("storage"));
     })
@@ -245,6 +271,11 @@ async function addNewProject(userToken) {
       .then((response) => {
         if (response.ok) {
           return response.json();
+        } else if (response.status == 401) {
+          /*si non autorisé et donc que le token est 
+          expiré le supprime et recharge la page*/
+          window.sessionStorage.removeItem("token");
+          location.reload();
         }
       })
       .then((responseJson) => {
@@ -252,6 +283,14 @@ async function addNewProject(userToken) {
         window.dispatchEvent(new Event("storage"));
         previewImage.classList.remove("preview-image-is-visible");
         formAddNewProject.reset();
+
+        //toggle afin d'afficher la partie 1 de la modale et non la 2
+        document
+          .querySelector(".gallery-step-modal")
+          .classList.toggle("active");
+        document
+          .querySelector(".add-works-step-modal")
+          .classList.toggle("active");
       })
       .catch((error) => console.log(`erreur : ${error}`));
   });
@@ -270,14 +309,24 @@ async function majProjectList() {
 
 if (sessionStorage.getItem("token") !== null) {
   const userToken = sessionStorage.getItem("token");
+  const hideFilters = document.querySelector(".js-project-filters");
+  const linksNavigation = document.querySelectorAll("header nav li a");
+  const authentication = linksNavigation[2];
+  const modalElementEdition = document.querySelector(
+    ".js-admin-toolbar-hidden"
+  );
+  const openEdit = document.querySelector(".js-modal-edit");
+  const modalContainer = document.querySelector(".modal-container");
+  const modalTriggers = document.querySelectorAll(".modal-trigger");
+  const modalToggleView = document.querySelectorAll(".toggle-modal-view");
+  const modalStepOne = document.querySelector(".gallery-step-modal");
+  const modalStepTwo = document.querySelector(".add-works-step-modal");
+  const deleteAllProjects = document.querySelector("#delete-gallery");
 
   //cacher les filtres
-  const hideFilters = document.querySelector(".js-project-filters");
   hideFilters.style.display = "none";
 
   //changer login en logout
-  const linksNavigation = document.querySelectorAll("header nav li a");
-  const authentication = linksNavigation[2];
   authentication.innerHTML = "logout";
 
   //lors du logout je supprime le token
@@ -288,9 +337,6 @@ if (sessionStorage.getItem("token") !== null) {
   });
 
   //Ajoute la bande noire en haut de la page
-  const modalElementEdition = document.querySelector(
-    ".js-admin-toolbar-hidden"
-  );
   modalElementEdition.innerHTML += `<div class="admin-toolbar-text"><i class="fa-regular fa-pen-to-square"></i>
   <p>Mode édition</p></div> 
   <button class="admin-toolbar-button">publier les changements</button>`;
@@ -301,14 +347,11 @@ if (sessionStorage.getItem("token") !== null) {
     .querySelector(".portfolio-title-layout")
     .setAttribute("style", "margin-bottom:3em");
 
-  const openEdit = document.querySelector(".js-modal-edit");
+  //bouton modifier
   openEdit.innerHTML += `<i class="fa-regular fa-pen-to-square"></i>
   <p>modifier</p>`;
 
   //toggle affiche ou cache la modale
-  const modalContainer = document.querySelector(".modal-container");
-  const modalTriggers = document.querySelectorAll(".modal-trigger");
-
   modalTriggers.forEach((trigger) =>
     trigger.addEventListener("click", () => {
       modalContainer.classList.toggle("active");
@@ -316,10 +359,6 @@ if (sessionStorage.getItem("token") !== null) {
   );
 
   //toggle affiche ou cache l'étape 1 ou 2 de la modale
-  const modalToggleView = document.querySelectorAll(".toggle-modal-view");
-  const modalStepOne = document.querySelector(".gallery-step-modal");
-  const modalStepTwo = document.querySelector(".add-works-step-modal");
-
   modalToggleView.forEach((trigger) =>
     trigger.addEventListener("click", () => {
       modalStepOne.classList.toggle("active");
@@ -328,6 +367,7 @@ if (sessionStorage.getItem("token") !== null) {
   );
 
   //generer projets dans la modale (partie 1)
+  // appele la fonction deleteWork en cas de click sur supprimer
   generateModalGallery(projectList, userToken);
 
   ////generer la partie 2 de la modale
@@ -336,15 +376,20 @@ if (sessionStorage.getItem("token") !== null) {
   //ajoute un nouveau projet
   addNewProject(userToken);
 
-  //s'active quand localStorage change
+  //s'active quand le sessionStorage ou le localStorage change
   window.addEventListener("storage", async () => {
-    let newProjectList = await majProjectList();
-    genererProjets(newProjectList);
-    generateModalGallery(newProjectList, userToken);
+    // si le token n'est plus la dans le sessionStorage se deconnecte
+    if (sessionStorage.getItem("token") == null) {
+      location.reload();
+    } else {
+      // si le localStorage change, actualise la liste des projets
+      let newProjectList = await majProjectList();
+      generateProjects(newProjectList);
+      generateModalGallery(newProjectList, userToken);
+    }
   });
 
   //delete every project
-  const deleteAllProjects = document.querySelector("#delete-gallery");
   deleteAllProjects.addEventListener("click", () => {
     console.log(projectList);
     for (let i in projectList) {

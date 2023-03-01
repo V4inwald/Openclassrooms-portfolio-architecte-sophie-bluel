@@ -52,7 +52,6 @@ body {
 	margin:auto;
 	font-family: 'Work Sans';
 	font-size: 14px;
-	height: 1;
 }
 header {
 	display: flex;
@@ -211,7 +210,7 @@ li:hover {
 
 }
 
-.filter-button:focus {
+.filter-button-active {
 	background-color: #1D6154;
 	color: #FFFFFF;
 }
@@ -259,11 +258,13 @@ margin: auto;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
+
 #contact label,
 #connection label,
 #new-work label {
 	margin: 2em 0 1em 0;
 }
+
 #contact textarea {
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
@@ -281,11 +282,45 @@ margin: auto;
 	font-weight: 700;
 	color: white;
 	background-color: #1D6154;
-	margin : 2em auto;
+	margin : 2rem auto;
 	width: 180px;
 	text-align: center;
 	border-radius: 60px;
 	cursor: pointer;
+}
+
+#login-submit {
+	margin-bottom: 1rem;
+}
+
+@keyframes appear {
+	from {opacity: 0}
+	to {opacity: 100}
+}
+
+@keyframes disappear {
+	from {opacity: 100}
+	to {opacity: 0}
+}
+
+.error-message,
+.error-box-to-big {
+	background-color: #D65353;
+	color: #ffffff;
+	font: inherit;
+	padding: 1rem 10px;
+	width: 100%;
+	margin-top: 20px;
+	box-sizing: border-box;
+	border-radius: 5px;
+	visibility: hidden;
+}
+
+.error-box-to-big {
+	z-index: -1;
+	position: absolute;
+	display: flex;
+	justify-content: center;
 }
 
 .inactive_button {
@@ -386,6 +421,11 @@ footer nav ul {
     justify-content: center;
 	align-items: center;
 	cursor: pointer;
+	transition: 0.1s;
+}
+
+.delete-icon:hover {
+	transform: scale(1.1);
 }
 
 .edit-gallery-work {

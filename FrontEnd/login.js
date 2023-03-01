@@ -32,6 +32,14 @@ loginForm.addEventListener("submit", (event) => {
     })
     .catch(() => {
       // console.log(`erreur : ${error}`);
-      alert("Erreur dans l’identifiant ou le mot de passe");
+      const errorMessage = document.querySelector(".error-message");
+      errorMessage.style.visibility = "visible";
+      errorMessage.style.animation = "appear 0.2s";
+      window.setTimeout(() => {
+        errorMessage.style.animation = "disappear 0.5s";
+        window.setTimeout(() => {
+          errorMessage.style.visibility = "hidden";
+        }, 500);
+      }, "5000");
     });
 });
