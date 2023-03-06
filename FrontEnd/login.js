@@ -1,6 +1,7 @@
 const loginForm = document.getElementById("connection");
 const linksNavigation = document.querySelectorAll("header nav li a");
 const authentication = linksNavigation[2];
+const urlApi = "http://localhost:5678";
 
 //mets le bouton Login en gras
 authentication.style.fontWeight = "600";
@@ -16,7 +17,7 @@ loginForm.addEventListener("submit", (event) => {
   const formDataString = JSON.stringify(inputLogin);
 
   //Appel a l'API
-  fetch("http://localhost:5678/api/users/login", {
+  fetch(`${urlApi}/api/users/login`, {
     method: "POST",
     headers: {
       accept: "application/json",
