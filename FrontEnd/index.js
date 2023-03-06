@@ -42,17 +42,19 @@ function generateProjects(projectsToGenerate) {
   }
 }
 
-//genere le filtres depuis la liste des categories
+//Genère le filtres depuis la liste des categories
 function generateFilters(filtersToGenerate) {
   const filterContainer = document.querySelector(".js-project-filters");
 
-  filterContainer.innerHTML += `<button class="filter-button filter-button-active">Tous</button>`;
+  filterContainer.innerHTML += `
+  <button class="filter-button filter-button-active">Tous</button>`;
 
   for (let i in filtersToGenerate) {
     let filterId = filtersToGenerate[i].id;
     let filterName = filtersToGenerate[i].name;
 
-    filterContainer.innerHTML += `<button id=category-${filterId}-button class="filter-button">${filterName}</button>`;
+    filterContainer.innerHTML += `
+    <button id=category-${filterId}-button class="filter-button">${filterName}</button>`;
   }
 }
 
@@ -232,6 +234,7 @@ function deleteWork(projectId, userToken) {
       }
     })
     .then((response) => {
+      //mets a jour la liste des projets
       localStorage.removeItem("projectListStored");
       window.dispatchEvent(new Event("storage"));
     })
@@ -254,12 +257,13 @@ async function addNewProject(userToken) {
       'select[name="category"]'
     ).value;
 
+    //utilise FormData pour les données du body
     const dataForm = new FormData();
-
     dataForm.append("image", imageForm, imageType);
     dataForm.append("title", imageTitle);
     dataForm.append("category", imageCategory);
 
+    //Appel a l'API
     fetch("http://localhost:5678/api/works", {
       method: "POST",
       headers: {
@@ -279,8 +283,10 @@ async function addNewProject(userToken) {
         }
       })
       .then((responseJson) => {
+        //mets a jour la liste des projets
         localStorage.removeItem("projectListStored");
         window.dispatchEvent(new Event("storage"));
+        //réinitialise le formulaire
         previewImage.classList.remove("preview-image-is-visible");
         formAddNewProject.reset();
 
