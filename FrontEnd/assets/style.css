@@ -304,7 +304,8 @@ margin: auto;
 }
 
 .error-message,
-.error-box-to-big {
+.error-box-to-big,
+.connection-error-message {
 	background-color: #D65353;
 	color: #ffffff;
 	font: inherit;
@@ -316,11 +317,16 @@ margin: auto;
 	visibility: hidden;
 }
 
-.error-box-to-big {
+.error-box-to-big,
+.connection-error-message {
 	z-index: -1;
 	position: absolute;
 	display: flex;
 	justify-content: center;
+}
+
+.connection-error-message {
+	top: 40%;
 }
 
 .inactive_button {

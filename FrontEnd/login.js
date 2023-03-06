@@ -35,7 +35,7 @@ loginForm.addEventListener("submit", (event) => {
       sessionStorage.setItem("token", responseJson.token);
       location.href = "index.html";
     })
-    .catch(() => {
+    .catch((error) => {
       console.log(`erreur : ${error}`);
       //affichage du message d'erreur pendant 5s
       const errorMessage = document.querySelector(".error-message");

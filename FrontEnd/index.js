@@ -186,7 +186,7 @@ function generateModalAddWorks(projectCategories) {
   };
 }
 // fonction qui genere la gallerie de travaux dans la partie 1 de la modale
-function generateModalGallery(projectList, userToken) {
+function generateModalGallery(projectList) {
   const galleryContainer = document.querySelector(".edit-gallery-container");
   galleryContainer.innerHTML = "";
 
@@ -209,18 +209,18 @@ function generateModalGallery(projectList, userToken) {
     deleteIcon.addEventListener("click", (event) => {
       let idToGet = deleteIcon.id;
       idToGet = idToGet.replace("delete-id-", "");
-      deleteWork(idToGet, userToken);
+      deleteWork(idToGet);
     });
   });
 }
 
 // supprime projet dont l'id est entré
-function deleteWork(projectId, userToken) {
+function deleteWork(projectId) {
   fetch(`http://localhost:5678/api/works/${projectId}`, {
     method: "DELETE",
     headers: {
       accept: "application/json",
-      Authorization: `Bearer ${userToken}`,
+      Authorization: `Bearer ${getToken()}`,
     },
   })
     .then((response) => {
@@ -230,7 +230,19 @@ function deleteWork(projectId, userToken) {
         /*si non autorisé et donc que le token est 
         expiré le supprime et recharge la page*/
         window.sessionStorage.removeItem("token");
-        location.reload();
+        const connectionErrorMessage = document.querySelector(
+          ".connection-error-message"
+        );
+        connectionErrorMessage.style.visibility = "visible";
+        connectionErrorMessage.style.zIndex = "1";
+        connectionErrorMessage.style.animation = "appear 0.2s";
+        window.setTimeout(() => {
+          connectionErrorMessage.style.animation = "disappear 0.5s";
+          window.setTimeout(() => {
+            connectionErrorMessage.style.visibility = "hidden";
+            connectionErrorMessage.style.zIndex = "1";
+          }, 500);
+        }, "5000");
       }
     })
     .then((response) => {
@@ -238,11 +250,11 @@ function deleteWork(projectId, userToken) {
       localStorage.removeItem("projectListStored");
       window.dispatchEvent(new Event("storage"));
     })
-    .catch((error) => console.log(`erreur : ${error}`));
+    .catch((error) => console.log("erreur"));
 }
 
 // ajoute un nouveau projet
-async function addNewProject(userToken) {
+async function addNewProject() {
   const formAddNewProject = document.querySelector("#new-work");
   const previewImage = document.querySelector(".preview-image");
 
@@ -268,7 +280,7 @@ async function addNewProject(userToken) {
       method: "POST",
       headers: {
         accept: "application/json",
-        Authorization: `Bearer ${userToken}`,
+        Authorization: `Bearer ${getToken()}`,
       },
       body: dataForm,
     })
@@ -279,7 +291,19 @@ async function addNewProject(userToken) {
           /*si non autorisé et donc que le token est 
           expiré le supprime et recharge la page*/
           window.sessionStorage.removeItem("token");
-          location.reload();
+          const connectionErrorMessage = document.querySelector(
+            ".connection-error-message"
+          );
+          connectionErrorMessage.style.visibility = "visible";
+          connectionErrorMessage.style.zIndex = "1";
+          connectionErrorMessage.style.animation = "appear 0.2s";
+          window.setTimeout(() => {
+            connectionErrorMessage.style.animation = "disappear 0.5s";
+            window.setTimeout(() => {
+              connectionErrorMessage.style.visibility = "hidden";
+              connectionErrorMessage.style.zIndex = "1";
+            }, 500);
+          }, "5000");
         }
       })
       .then((responseJson) => {
@@ -311,10 +335,16 @@ async function majProjectList() {
   return projectList;
 }
 
+function getToken() {
+  if (sessionStorage.getItem("token") !== null) {
+    let userToken = sessionStorage.getItem("token");
+    return userToken;
+  }
+}
+
 // Je verifie si il y a un tocken, si oui j'affiche la fenetre modale
 
 if (sessionStorage.getItem("token") !== null) {
-  const userToken = sessionStorage.getItem("token");
   const hideFilters = document.querySelector(".js-project-filters");
   const linksNavigation = document.querySelectorAll("header nav li a");
   const authentication = linksNavigation[2];
@@ -374,32 +404,27 @@ if (sessionStorage.getItem("token") !== null) {
 
   //generer projets dans la modale (partie 1)
   // appele la fonction deleteWork en cas de click sur supprimer
-  generateModalGallery(projectList, userToken);
+  generateModalGallery(projectList);
 
   ////generer la partie 2 de la modale
   generateModalAddWorks(projectCategories);
 
   //ajoute un nouveau projet
-  addNewProject(userToken);
+  addNewProject();
 
   //s'active quand le sessionStorage ou le localStorage change
   window.addEventListener("storage", async () => {
-    // si le token n'est plus la dans le sessionStorage se deconnecte
-    if (sessionStorage.getItem("token") == null) {
-      location.reload();
-    } else {
-      // si le localStorage change, actualise la liste des projets
-      let newProjectList = await majProjectList();
-      generateProjects(newProjectList);
-      generateModalGallery(newProjectList, userToken);
-    }
+    // si le localStorage change, actualise la liste des projets
+    let newProjectList = await majProjectList();
+    generateProjects(newProjectList);
+    generateModalGallery(newProjectList);
   });
 
   //delete every project
   deleteAllProjects.addEventListener("click", () => {
     console.log(projectList);
     for (let i in projectList) {
-      deleteWork(projectList[i].id, userToken);
+      deleteWork(projectList[i].id);
     }
   });
 }
