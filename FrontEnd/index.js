@@ -1,5 +1,5 @@
 // --------------------- Je récupère les données du serveur ---------------------
-
+const urlApi = "http://localhost:5678";
 //Récupere la liste des projets et catégories dans le localStorage
 
 let projectList = window.localStorage.getItem("projectListStored");
@@ -7,12 +7,10 @@ let projectCategories = window.localStorage.getItem("projectCategoriesStored");
 //Si pas dans le localStorage les demande a l'API et les stocke
 if (projectList === null || projectCategories === null) {
   // Liste des projets
-  const response = await fetch("http://localhost:5678/api/works");
+  const response = await fetch(`${urlApi}/api/works`);
   projectList = await response.json();
   //liste des catégories
-  const responseCategories = await fetch(
-    "http://localhost:5678/api/categories"
-  );
+  const responseCategories = await fetch(`${urlApi}/api/categories`);
   projectCategories = await responseCategories.json();
   // Transformation des listes en JSON
   const stringProjectList = JSON.stringify(projectList);
@@ -216,7 +214,7 @@ function generateModalGallery(projectList) {
 
 // supprime projet dont l'id est entré
 function deleteWork(projectId) {
-  fetch(`http://localhost:5678/api/works/${projectId}`, {
+  fetch(`${urlApi}/api/works/${projectId}`, {
     method: "DELETE",
     headers: {
       accept: "application/json",
@@ -276,7 +274,7 @@ async function addNewProject() {
     dataForm.append("category", imageCategory);
 
     //Appel a l'API
-    fetch("http://localhost:5678/api/works", {
+    fetch(`${urlApi}/api/works`, {
       method: "POST",
       headers: {
         accept: "application/json",
@@ -328,7 +326,7 @@ async function addNewProject() {
 
 //mets a jour la liste des projets
 async function majProjectList() {
-  const response = await fetch("http://localhost:5678/api/works");
+  const response = await fetch(`${urlApi}/api/works`);
   projectList = await response.json();
   const stringProjectList = JSON.stringify(projectList);
   window.localStorage.setItem("projectListStored", stringProjectList);
