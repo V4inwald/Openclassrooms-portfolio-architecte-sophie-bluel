@@ -214,7 +214,9 @@ export async function addNewProject() {
     })
       .then((response) => {
         if (response.ok) {
-          return response.json();
+          //mets a jour la liste des projets
+          localStorage.removeItem("projectListStored");
+          window.dispatchEvent(new Event("storage"));
         } else if (response.status == 401) {
           /*si non autorisé supprime le token 
             puis affiche un message d'erreur*/
@@ -223,9 +225,6 @@ export async function addNewProject() {
         }
       })
       .then(() => {
-        //mets a jour la liste des projets
-        localStorage.removeItem("projectListStored");
-        window.dispatchEvent(new Event("storage"));
         //réinitialise le formulaire
         previewImage.classList.remove("preview-image-is-visible");
         formAddNewProject.reset();
