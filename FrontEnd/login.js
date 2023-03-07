@@ -1,7 +1,8 @@
+import { showErrorMessage, urlApi } from "./assets/exports.js";
+
 const loginForm = document.getElementById("connection");
 const linksNavigation = document.querySelectorAll("header nav li a");
 const authentication = linksNavigation[2];
-const urlApi = "http://localhost:5678";
 
 //mets le bouton Login en gras
 authentication.style.fontWeight = "600";
@@ -38,15 +39,8 @@ loginForm.addEventListener("submit", (event) => {
     })
     .catch((error) => {
       console.log(`erreur : ${error}`);
+
       //affichage du message d'erreur pendant 5s
-      const errorMessage = document.querySelector(".error-message");
-      errorMessage.style.visibility = "visible";
-      errorMessage.style.animation = "appear 0.2s";
-      window.setTimeout(() => {
-        errorMessage.style.animation = "disappear 0.5s";
-        window.setTimeout(() => {
-          errorMessage.style.visibility = "hidden";
-        }, 500);
-      }, "5000");
+      showErrorMessage("error-message", 5000);
     });
 });
